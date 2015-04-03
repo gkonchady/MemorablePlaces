@@ -7,26 +7,22 @@
 //
 
 import UIKit
+import CoreData
 
-var places = [Dictionary<String, String>()]
+//var places = [Dictionary<String, String>()]
+var places = [NSManagedObjectContext]()
 
 class TableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-        
-        if places.count == 1 {
+       
+        /*if places.count == 1 {
             
             places.removeAtIndex(0)
             
             places.append(["name": "My Favorite Place", "lat": "test", "lon": "test"])
-        }
+        }*/
     }
 
     override func didReceiveMemoryWarning() {
@@ -47,11 +43,11 @@ class TableViewController: UITableViewController {
         // Return the number of rows in the section.
         return places.count
     }
-
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
-        cell.textLabel!.text =  places[indexPath.row]["name"]
+        let place =  places[indexPath.row]
+        cell.textLabel!.text = place.valueForKey("name") as? String
         return cell
     }
 
