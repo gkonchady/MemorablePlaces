@@ -18,20 +18,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
+        //Setup location manager
         manager = CLLocationManager()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBest
         manager.requestWhenInUseAuthorization()
         manager.startUpdatingLocation()
         
+        //set up long tap gesture recognizer
         var uilpgr = UILongPressGestureRecognizer(target: self, action: "addLocation:")
         uilpgr.minimumPressDuration = 2.0
         map.addGestureRecognizer(uilpgr)
     }
     
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
+        //set default location on the map to the center of the location returned by the location manager
         var location: CLLocation = locations[0] as CLLocation
         var latitude = location.coordinate.latitude
         var longitude = location.coordinate.longitude
@@ -43,6 +45,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         self.map.setRegion(region, animated: true)
     }
     
+    //Adds location on the map on a long tap
     func addLocation(gestureRecognizer: UIGestureRecognizer){
         //executed once per long press
         if gestureRecognizer.state == UIGestureRecognizerState.Began {
@@ -71,15 +74,28 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                     if title == "" {
                         title = "Added \(NSDate())"
                     }
-                    
-                    //places.append(["name": title, "lat": "\(newCoordinate.latitude)", "lon": "\(newCoordinate.longitude)"])
-                    
+                    self.savePlace(title, userLocation: userLocation)
                     var annotation = MKPointAnnotation()
                     annotation.coordinate = newCoordinate
                     annotation.title = title
                     self.map.addAnnotation(annotation)
                 }
             })
+        }
+    }
+    
+    //saves the place to CoreData
+    func savePlace(name: String, userLocation: CLLocation) {
+        let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
+        let managedContext = appDelegate.managedObjectContext!
+        let place = NSEntityDescription.insertNewObjectForEntityForName("Place",
+                    inManagedObjectContext: appDelegate.managedObjectContext!) as Place
+        place.name = name
+        place.latitude = "\(userLocation.coordinate.latitude)"
+        place.longitude = "\(userLocation.coordinate.longitude)"
+        var error: NSError?
+        if !managedContext.save(&error) {
+            println("Could not save \(error), \(error?.userInfo)")
         }
     }
 

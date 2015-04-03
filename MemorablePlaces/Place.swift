@@ -1,5 +1,5 @@
 //
-//  Place.swift
+//  Place.swift (Places model)
 //  MemorablePlaces
 //
 //  Created by Gaurav Konchady on 4/2/15.
@@ -9,10 +9,11 @@
 import Foundation
 import CoreData
 
+@objc(Place)
 class Place: NSManagedObject {
 
+    @NSManaged var name: String
     @NSManaged var latitude: String
     @NSManaged var longitude: String
-    @NSManaged var name: String
 
 }

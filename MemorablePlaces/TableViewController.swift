@@ -9,20 +9,31 @@
 import UIKit
 import CoreData
 
-//var places = [Dictionary<String, String>()]
-var places = [NSManagedObjectContext]()
+var places = [Place]()
 
 class TableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-       
-        /*if places.count == 1 {
-            
-            places.removeAtIndex(0)
-            
-            places.append(["name": "My Favorite Place", "lat": "test", "lon": "test"])
-        }*/
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        //Fetch places data from core data and populate table view
+        let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
+        let managedContext = appDelegate.managedObjectContext!
+        let fetchRequest = NSFetchRequest(entityName: "Place")
+        var error: NSError?
+        let fetchedResults = managedContext.executeFetchRequest(fetchRequest,
+                                                                error: &error) as? [Place]
+        if let results = fetchedResults {
+            places = results
+        } else {
+            println("Could not fetch \(error), \(error!.userInfo)")
+        }
+        dispatch_async(dispatch_get_main_queue()) {
+            self.tableView.reloadData()
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -31,16 +42,11 @@ class TableViewController: UITableViewController {
     }
 
     // MARK: - Table view data source
-
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Potentially incomplete method implementation.
-        // Return the number of sections.
         return 1
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
         return places.count
     }
     
